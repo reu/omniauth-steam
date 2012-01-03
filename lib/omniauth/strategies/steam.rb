@@ -1,53 +1,46 @@
 module OmniAuth
   module Strategies
     class Steam < OmniAuth::Strategies::OpenID
-      def initialize(app, store = nil, api_key = nil, options = {}, &block)
-        options[:identifier] ||= "http://steamcommunity.com/openid"
-        options[:name] ||= 'steam'
-        @api_key = api_key
-        super(app, store, options, &block)
-      end
+      args :api_key
 
-      def user_info(response=nil)
-        player = user_hash['response']['players']['player'].first
-        nickname = player["personaname"]
-        name = player["realname"]
-        url = player["profileurl"]
-        country = player["loccountrycode"]
-        state = player["locstatecode"]
-        city = player["loccityid"]
+      option :api_key, nil
+      option :name, "steam"
+      option :identifier, "http://steamcommunity.com/openid"
 
+      uid { steam_id }
+
+      info do
         {
-          'nickname' => nickname,
-          'name' => name,
-          'url' => url,
-          'location' => "#{city}, #{state}, #{country}"
+          "nickname" => player["personaname"],
+          "name"     => player["realname"],
+          "location" => [player["loccityid"], player["locstatecode"], player["loccountrycode"]].compact.join(", "),
+          "image"    => player["avatarmedium"],
+          "urls"     => {
+            "Profile" => player["profileurl"]
+          }
         }
       end
 
-      def user_hash
-        # Steam provides no information back on a openid response other than a 64bit user id
-        # Need to use this information and make a API call to get user information from steam.
-        if @api_key
-          unless @user_hash
-            uri = URI.parse("http://api.steampowered.com/")
-            req = Net::HTTP::Get.new("#{uri.path}ISteamUser/GetPlayerSummaries/v0001/?key=#{@api_key}&steamids=#{@openid_response.display_identifier.split("/").last}")
-            res = Net::HTTP.start(uri.host, uri.port) {|http|
-              http.request(req)
-            }
-          end
-          @user_hash ||= MultiJson.decode(res.body)
-        else
-          {}
-        end
+      extra do
+        { "raw_info" => player }
       end
 
-      def auth_hash
-        OmniAuth::Utils.deep_merge(super, {
-          'uid' => @openid_response.display_identifier.split("/").last,
-          'user_info' => user_info,
-          'extra' => {'user_hash' => user_hash}
-        })
+      private
+
+      def raw_info
+        @raw_info ||= options.api_key ? MultiJson.decode(Net::HTTP.get(player_profile_uri)) : {}
+      end
+
+      def player
+        @player ||= raw_info["response"]["players"]["player"].first
+      end
+
+      def steam_id
+        openid_response.display_identifier.split("/").last
+      end
+
+      def player_profile_uri
+        URI.parse("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0001/?key=#{options.api_key}&steamids=#{steam_id}")
       end
     end
   end
