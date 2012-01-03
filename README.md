@@ -1,6 +1,6 @@
 # OmniAuth Steam
 
-This gem is an OmniAuth 1.0 strategy supporting the OpenID Steam API.
+This gem is an OmniAuth 1.0 strategy, supporting the OpenID Steam API.
 
 ## Usage
 
