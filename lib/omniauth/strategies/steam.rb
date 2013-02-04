@@ -1,3 +1,6 @@
+require 'omniauth-openid'
+require 'multi_json'
+
 module OmniAuth
   module Strategies
     class Steam < OmniAuth::Strategies::OpenID
@@ -32,7 +35,7 @@ module OmniAuth
       end
 
       def player
-        @player ||= raw_info["response"]["players"]["player"].first
+        @player ||= raw_info["response"]["players"].first
       end
 
       def steam_id
@@ -40,7 +43,7 @@ module OmniAuth
       end
 
       def player_profile_uri
-        URI.parse("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0001/?key=#{options.api_key}&steamids=#{steam_id}")
+        URI.parse("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{options.api_key}&steamids=#{steam_id}")
       end
     end
   end
