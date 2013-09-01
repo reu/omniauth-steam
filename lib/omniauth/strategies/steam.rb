@@ -38,12 +38,24 @@ module OmniAuth
         @player ||= raw_info["response"]["players"].first
       end
 
+      def friend_list
+        @friend_list ||= options.api_key ? MultiJson.decode(Net::HTTP.get(player_friends)) : {}
+      end
+
+      def friend
+        @friend ||= friend_list["friendslist"]['friends'].first
+      end
+
       def steam_id
         openid_response.display_identifier.split("/").last
       end
 
       def player_profile_uri
         URI.parse("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{options.api_key}&steamids=#{steam_id}")
+      end
+
+      def player_friends
+        URI.parse("http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=#{options.api_key}&steamid=#{steam_id}&relationship=friend")
       end
     end
   end

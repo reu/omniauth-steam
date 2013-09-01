@@ -65,6 +65,13 @@ Here's an example of the *Authentication Hash* available in `request.env['omniau
       :timecreated => 1243031082,
       :loccountrycode => "BR"
     }
+  },
+  :friendlist => {
+    :friends => {
+      :steamid => "76561198080896563",
+      :relationship => "friend",
+      :friend_since => 1375762789
+    }
   }
 }
 ```
