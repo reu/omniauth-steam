@@ -1,6 +1,5 @@
 source "https://rubygems.org"
 
-gem "pry"
 gem "sinatra"
 gem "omniauth-openid"
 gem "omniauth-steam"
