@@ -19,7 +19,8 @@ module OmniAuth
           "location" => [player["loccityid"], player["locstatecode"], player["loccountrycode"]].compact.join(", "),
           "image"    => player["avatarmedium"],
           "urls"     => {
-            "Profile" => player["profileurl"]
+            "Profile" => player["profileurl"],
+            "FriendList" => player_list_url
           }
         }
       end
@@ -44,6 +45,10 @@ module OmniAuth
 
       def player_profile_uri
         URI.parse("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=#{options.api_key}&steamids=#{steam_id}")
+      end
+      
+      def player_list_url
+        URI.parse("http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=#{options.api_key}&steamid=#{steam_id}&relationship=friend")
       end
     end
   end
