@@ -14,7 +14,7 @@ And then integrate the strategy into your middleware:
 
 ```ruby
 use OmniAuth::Builder do
-  provider :steam, ENV['STEAM_WEB_API_KEY']
+  provider :steam, "my-steam-web-api-key"
 end
 ```
 
@@ -22,7 +22,7 @@ If you are using Rails, you may want to add it to the middleware stack:
 
 ```ruby
 Rails.application.config.middleware.use OmniAuth::Builder do
-  provider :steam, ENV['STEAM_WEB_API_KEY']
+  provider :steam, "my-steam-web-api-key"
 end
 ```
 
