@@ -7,7 +7,7 @@ require "openid/store/filesystem"
 require "omniauth/strategies/steam"
 
 puts "Please inform your Steam API key: "
-api_key = gets.strip
+api_key = ENV["STEAM_WEB_API_KEY"] || STDIN.gets.strip
 
 use Rack::Session::Cookie
 
