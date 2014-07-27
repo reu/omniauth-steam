@@ -1,2 +1,2 @@
 require "omniauth-steam/version"
-require "omniauth/strategies/steam"
+require File.expand_path("../omniauth/strategies/steam", __FILE__)
