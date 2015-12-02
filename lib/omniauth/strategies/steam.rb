@@ -13,6 +13,7 @@ module OmniAuth
       uid { steam_id }
 
       info do
+        begin
         {
           "nickname" => player["personaname"],
           "name"     => player["realname"],
@@ -22,21 +23,30 @@ module OmniAuth
             "Profile" => player["profileurl"],
             "FriendList" => friend_list_url
           }
-        }
+        }        
+        rescue MultiJson::ParseError => exception
+          fail!(:steamError, exception)
+          {}
+        end
       end
 
       extra do
-        { "raw_info" => player }
+        begin
+          { "raw_info" => player }
+        rescue MultiJson::ParseError => exception
+          fail!(:steamError, exception)
+          {}
+        end
       end
 
       private
 
       def raw_info
-        @raw_info ||= options.api_key ? MultiJson.decode(Net::HTTP.get(player_profile_uri)) : {}
+          @raw_info ||= options.api_key ? MultiJson.decode(Net::HTTP.get(player_profile_uri)) : {}
       end
 
       def player
-        @player ||= raw_info["response"]["players"].first
+          @player ||= raw_info["response"]["players"].first
       end
 
       def steam_id
