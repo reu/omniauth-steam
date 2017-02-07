@@ -23,7 +23,7 @@ module OmniAuth
             "Profile" => player["profileurl"],
             "FriendList" => friend_list_url
           }
-        }        
+        }
         rescue MultiJson::ParseError => exception
           fail!(:steamError, exception)
           {}
@@ -42,15 +42,22 @@ module OmniAuth
       private
 
       def raw_info
-          @raw_info ||= options.api_key ? MultiJson.decode(Net::HTTP.get(player_profile_uri)) : {}
+        @raw_info ||= options.api_key ? MultiJson.decode(Net::HTTP.get(player_profile_uri)) : {}
       end
 
       def player
-          @player ||= raw_info["response"]["players"].first
+        @player ||= raw_info["response"]["players"].first
       end
 
       def steam_id
-        openid_response.display_identifier.split("/").last
+        @steam_id ||= begin
+                        claimed_id = openid_response.display_identifier.split('/').last
+                        expected_uri = "http://steamcommunity.com/openid/id/#{claimed_id}"
+                        if openid_response.endpoint.claimed_id != expected_uri
+                          raise 'Steam Claimed ID mismatch!'
+                        end
+                        claimed_id
+                      end
       end
 
       def player_profile_uri
